@@ -1,0 +1,20 @@
+{
+  "name": "Kai — Operación Irlanda",
+  "short_name": "Kai Irlanda",
+  "description": "Hábitos, entrenamiento y progreso rumbo a Irlanda.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
