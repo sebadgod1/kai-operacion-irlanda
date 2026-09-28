@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Kai — Operación Irlanda</title>
+  <desc id="description">Letra K oscura sobre un icono cuadrado azul y cian.</desc>
+  <defs>
+    <linearGradient id="surface" x1="96" y1="72" x2="430" y2="452" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#29e1e8"/>
+      <stop offset="0.52" stop-color="#20b9e8"/>
+      <stop offset="1" stop-color="#267cf0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientTransform="translate(166 116) rotate(46) scale(380)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.32"/>
+      <stop offset="0.65" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#07111f"/>
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="#102a43"/>
+  <rect x="72" y="72" width="368" height="368" rx="82" fill="url(#surface)"/>
+  <rect x="72" y="72" width="368" height="368" rx="82" fill="url(#glow)"/>
+  <path d="M166 142h66v91l86-91h84L292 251l119 119h-89l-90-96v96h-66V142Z" fill="#07111f"/>
+</svg>
