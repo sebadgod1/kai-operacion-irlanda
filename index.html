@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07111f">
-  <meta name="description" content="Tu plan diario gamificado rumbo a Irlanda.">
+  <meta name="theme-color" content="#06111f">
+  <meta name="description" content="Disciplina y progreso rumbo a Irlanda, acompañado por Kai.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kai Irlanda">
@@ -15,113 +15,80 @@
   <title>Kai — Operación Irlanda</title>
 </head>
 <body>
-  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
   <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-mark" aria-hidden="true">K</div>
-      <div><p class="eyebrow">OPERACIÓN IRLANDA 🇮🇪</p><h1 id="page-title">Hoy</h1></div>
-      <div class="level-pill"><span>NV.</span><strong id="header-level">1</strong></div>
-    </header>
-
     <main>
-      <section class="view active" id="view-today" data-title="Hoy">
-        <article class="hero-card">
-          <div class="hero-top"><div><p class="label">Rumbo a Irlanda</p><div class="countdown"><strong id="days-left">—</strong><span>días</span></div></div><div class="flag-orbit">🇮🇪</div></div>
-          <div class="progress-track hero-track"><span id="daily-bar"></span></div>
-          <div class="hero-bottom"><strong id="daily-percent">0%</strong><span id="daily-count">0 de 6 misiones</span></div>
-        </article>
-
-        <div class="stat-row">
-          <article class="mini-stat"><span>⚡</span><div><small>XP TOTAL</small><strong id="total-xp">0</strong></div></article>
-          <article class="mini-stat"><span>🔥</span><div><small>RACHA</small><strong><b id="streak">0</b> días</strong></div></article>
-          <article class="mini-stat"><span>🛡️</span><div><small>NIVEL</small><strong id="level-name">Novato</strong></div></article>
-        </div>
-
-        <article class="kai-card"><div class="kai-avatar">KAI</div><div><p class="label">MENSAJE DE KAI</p><p id="kai-message"></p></div></article>
-
-        <div class="section-heading"><div><p class="eyebrow">MISIONES DIARIAS</p><h2>Gana el día</h2></div><span id="mission-xp">+0 XP</span></div>
-        <div id="habit-list" class="habit-list"></div>
-        <div id="perfect-day" class="perfect-banner">PERFECT DAY ✨ <small>+20 XP · Día ganado</small></div>
-
-        <div class="section-heading training-heading"><div><p class="eyebrow">ENTRENAMIENTO SEMANAL</p><h2>Mueve el cuerpo</h2></div><span id="week-label"></span></div>
-        <div id="training-list" class="training-list"></div>
-        <div id="perfect-week" class="perfect-banner week">PERFECT WEEK 🏆 <small>+50 XP · Semana ganada</small></div>
-
-        <article class="reflection-card">
-          <div><span class="reflection-icon">✦</span><div><p class="eyebrow">BITÁCORA</p><h2>¿Cómo estuvo tu día?</h2></div></div>
-          <textarea id="reflection" maxlength="600" rows="4" placeholder="Escribe unas líneas para tu yo del futuro…"></textarea>
-          <small id="save-status">Se guarda automáticamente</small>
-        </article>
-      </section>
-
-      <section class="view" id="view-progress" data-title="Progreso">
-        <div class="page-intro"><p class="eyebrow">TU EVOLUCIÓN</p><h2>El avance que no siempre ves.</h2><p>Cada misión suma. Acá está la evidencia.</p></div>
-        <article class="level-card"><div class="level-orb"><span>NIVEL</span><strong id="progress-level">1</strong></div><div class="level-info"><p class="eyebrow" id="progress-rank">NOVATO</p><h2><span id="progress-xp">0</span> XP</h2><div class="progress-track"><span id="level-bar"></span></div><small id="next-level">100 XP para el próximo nivel</small></div></article>
-        <div class="metric-grid">
-          <article><span>7 DÍAS</span><strong id="metric-7">0%</strong><small>cumplimiento</small></article>
-          <article><span>30 DÍAS</span><strong id="metric-30">0%</strong><small>cumplimiento</small></article>
-          <article><span>🇬🇧 INGLÉS</span><strong id="metric-english">0m</strong><small>acumulados</small></article>
-          <article><span>📖 LECTURA</span><strong id="metric-reading">0m</strong><small>acumulados</small></article>
-          <article><span>🇬🇧 PROMEDIO 7 DÍAS</span><strong id="metric-english-avg">0m</strong><small>inglés por día</small></article>
-          <article><span>📖 PROMEDIO 7 DÍAS</span><strong id="metric-reading-avg">0m</strong><small>lectura por día</small></article>
-          <article><span>✨ DÍAS GANADOS</span><strong id="metric-perfect">0</strong><small>días 6/6</small></article>
-          <article><span>🏆 SEMANAS GANADAS</span><strong id="metric-weeks">0</strong><small>metas completas</small></article>
-          <article><span>🔥 RACHA DIARIA</span><strong id="metric-daily-streak">0</strong><small>días actuales</small></article>
-          <article><span>🛡️ RÉCORD DIARIO</span><strong id="metric-best">0</strong><small>mejor racha</small></article>
-          <article><span>⚓ RACHA SEMANAL</span><strong id="metric-weekly-streak">0</strong><small>semanas actuales</small></article>
-          <article><span>🥇 RÉCORD SEMANAL</span><strong id="metric-weekly-best">0</strong><small>mejor racha</small></article>
-        </div>
-        <div class="section-heading"><div><p class="eyebrow">SKILLS</p><h2>Tu build actual</h2></div></div>
-        <div id="skills-list" class="skills-list"></div>
-        <div class="section-heading"><div><p class="eyebrow">ESTA SEMANA</p><h2>Entrenamientos</h2></div></div>
-        <div id="progress-trainings" class="training-list compact"></div>
-        <div class="section-heading"><div><p class="eyebrow">LOGROS</p><h2>Medallas desbloqueadas</h2></div></div>
-        <div id="achievements-list" class="achievement-grid"></div>
-      </section>
-
-      <section class="view" id="view-calendar" data-title="Calendario">
-        <div class="page-intro"><p class="eyebrow">HISTORIAL</p><h2>Tu consistencia, día a día.</h2></div>
-        <article class="calendar-card">
-          <div class="calendar-header"><button id="prev-month" class="icon-button" aria-label="Mes anterior">‹</button><h2 id="calendar-month"></h2><button id="next-month" class="icon-button" aria-label="Mes siguiente">›</button></div>
-          <div class="weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
-          <div id="calendar-grid" class="calendar-grid"></div>
-          <div class="legend"><span><i class="great"></i>Muy completo</span><span><i class="partial"></i>Parcial</span><span><i class="low"></i>Bajo</span><span><i></i>Sin datos</span></div>
-        </article>
-        <article id="day-detail" class="day-detail empty"><p>Toca un día con información para ver el detalle.</p></article>
-      </section>
-
-      <section class="view" id="view-settings" data-title="Ajustes">
-        <div class="page-intro"><p class="eyebrow">CONTROL</p><h2>Tus datos son tuyos.</h2><p>Todo se guarda solamente en este dispositivo.</p></div>
-        <article class="settings-group"><h3>Apariencia</h3>
-          <div class="theme-picker" role="group" aria-label="Tema visual">
-            <button data-theme="classic"><span>◆</span><strong>Clásico</strong><small>Identidad original</small></button>
-            <button data-theme="voyage"><span>⚓</span><strong>Grand Voyage</strong><small>Elegancia náutica</small></button>
+      <section class="view active" id="view-today" aria-label="Hoy">
+        <header class="hero">
+          <div class="hero-copy"><p>OPERACIÓN IRLANDA <span aria-hidden="true">🇮🇪</span></p><h1>Disciplina hoy.<br>Libertad mañana.</h1></div>
+          <div class="hero-metrics">
+            <div><strong id="days-left">—</strong><span>DÍAS PARA IRLANDA</span></div>
+            <div><strong id="daily-percent">0%</strong><span>PROGRESO HOY</span></div>
+            <div><strong id="hero-xp">0 XP</strong><span id="hero-level">NIVEL 1</span></div>
+            <div><strong><b id="hero-streak">0</b> días</strong><span>RACHA ACTUAL</span></div>
           </div>
+          <div class="progress-track hero-progress"><span id="daily-bar"></span></div>
+        </header>
+
+        <article class="kai-card">
+          <div class="kai-head"><div class="kai-avatar" aria-hidden="true">K</div><div><strong>KAI</strong><span>TU COACH DE DISCIPLINA</span></div></div>
+          <p id="kai-message"></p>
+          <button id="next-mission" class="next-mission"><span class="target">◎</span><span><small>SIGUIENTE MISIÓN</small><strong id="next-mission-label">Hacer la cama</strong></span><b>›</b></button>
         </article>
-        <article class="settings-group"><h3>Datos y respaldo</h3>
-          <button class="settings-action" id="export-json"><span>⬇️</span><div><strong>Exportar backup JSON</strong><small>Guarda todo tu progreso</small></div><b>›</b></button>
-          <label class="settings-action" for="import-json"><span>⬆️</span><div><strong>Importar backup JSON</strong><small>También acepta kai-irlanda-v1</small></div><b>›</b></label><input type="file" id="import-json" accept="application/json,.json" hidden>
-          <button class="settings-action" id="export-csv"><span>📊</span><div><strong>Exportar historial CSV</strong><small>Compatible con planillas</small></div><b>›</b></button>
-        </article>
-        <article class="settings-group danger-zone"><h3>Zona de reinicio</h3>
-          <button class="settings-action" id="reset-today"><span>↻</span><div><strong>Reiniciar el día actual</strong><small>No afecta tu historial anterior</small></div><b>›</b></button>
-          <button class="settings-action danger" id="reset-all"><span>⚠️</span><div><strong>Reiniciar todos los datos</strong><small>Esta acción no se puede deshacer</small></div><b>›</b></button>
-        </article>
-        <article class="install-card"><span>📲</span><div><h3>Instálala en tu iPhone</h3><p>En Safari toca Compartir y luego “Añadir a pantalla de inicio”.</p></div></article>
-        <p class="app-version">KAI — OPERACIÓN IRLANDA · v3.0.0<br>Hecha para llegar preparado 🇨🇱 → 🇮🇪</p>
+
+        <section class="content-card habits-section">
+          <div class="section-title"><div><p>☀︎ &nbsp;HÁBITOS ESENCIALES</p><h2>Gana el día</h2></div><span id="daily-count">0 / 6</span></div>
+          <div id="habit-list" class="habit-list"></div>
+          <div id="perfect-day" class="perfect-banner"><strong>PERFECT DAY ✨</strong><span>DÍA GANADO · +20 XP</span><p>6/6. Día cerrado. Mañana repetimos.</p></div>
+        </section>
+
+        <section class="content-card training-section">
+          <div class="section-title"><div><p>ENTRENAMIENTO SEMANAL</p><h2>Distribuye el esfuerzo</h2></div><span id="week-label"></span></div>
+          <div id="training-list" class="training-list"></div>
+          <div id="training-week" class="training-week" aria-label="Distribución semanal"></div>
+          <div id="perfect-week" class="perfect-banner"><strong>PERFECT WEEK 🏆</strong><span>SEMANA GANADA · +50 XP</span></div>
+        </section>
+
+        <article class="reflection-card"><label for="reflection"><span>BITÁCORA</span><strong>¿Cómo estuvo tu día?</strong></label><textarea id="reflection" maxlength="600" rows="3" placeholder="Una nota breve para tu yo del futuro…"></textarea><small id="save-status">Se guarda automáticamente</small></article>
+      </section>
+
+      <section class="view" id="view-progress" aria-label="Progreso">
+        <header class="page-header"><p>TU EVOLUCIÓN</p><h1>Progreso real.</h1><span>Lo importante primero. Sin métricas de relleno.</span></header>
+        <div class="priority-grid">
+          <article><span>🔥 RACHA ACTUAL</span><strong id="metric-daily-streak">0</strong><small>días</small></article>
+          <article><span>✨ DÍAS GANADOS</span><strong id="metric-perfect">0</strong><small>6/6</small></article>
+          <article class="wide"><span>⭐ NIVEL <b id="progress-level">1</b></span><strong><b id="progress-xp">0</b> XP</strong><div class="progress-track"><i id="level-bar"></i></div><small id="next-level"></small></article>
+          <article><span>📈 CONSISTENCIA 7 DÍAS</span><strong id="metric-7">0%</strong><small>de 42 oportunidades</small></article>
+        </div>
+        <section class="progress-group"><h2>Tiempo invertido</h2><div class="time-grid"><article><span>🇬🇧 INGLÉS</span><strong id="metric-english">0 min</strong><small>total · <b id="metric-english-avg">0</b> min/día esta semana</small></article><article><span>📖 LECTURA</span><strong id="metric-reading">0 min</strong><small>total · <b id="metric-reading-avg">0</b> min/día esta semana</small></article></div></section>
+        <section class="progress-group"><h2>Récords</h2><div class="record-row"><div><strong id="metric-weeks">0</strong><span>Semanas ganadas</span></div><div><strong id="metric-weekly-streak">0</strong><span>Racha semanal</span></div><div><strong id="metric-best">0</strong><span>Récord diario</span></div><div><strong id="metric-weekly-best">0</strong><span>Récord semanal</span></div></div></section>
+        <section class="progress-group"><h2>Skills con evidencia</h2><div id="skills-list" class="skills-list"></div></section>
+        <section class="progress-group"><h2>Logros</h2><div id="achievements-list" class="achievement-grid"></div></section>
+      </section>
+
+      <section class="view" id="view-calendar" aria-label="Calendario">
+        <header class="page-header"><p>HISTORIAL</p><h1>Tu consistencia.</h1></header>
+        <article class="calendar-card"><div class="calendar-header"><button id="prev-month" aria-label="Mes anterior">‹</button><h2 id="calendar-month"></h2><button id="next-month" aria-label="Mes siguiente">›</button></div><div class="weekdays"><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span></div><div id="calendar-grid" class="calendar-grid"></div><div class="legend"><span><i class="great"></i>Ganado</span><span><i class="partial"></i>Parcial</span><span><i class="low"></i>Bajo</span><span><i></i>Sin registro</span></div></article>
+        <article id="day-detail" class="day-detail empty"><p>Toca un día para ver su detalle.</p></article>
+      </section>
+
+      <section class="view" id="view-settings" aria-label="Ajustes">
+        <header class="page-header"><p>AJUSTES</p><h1>Tus datos son tuyos.</h1><span>Todo permanece en este dispositivo.</span></header>
+        <article class="settings-group"><h2>Datos y respaldo</h2><div class="backup-status"><span>Último respaldo</span><strong id="last-backup">Nunca</strong><small id="backup-warning"></small></div><button class="settings-action" id="export-json"><span>⇩</span><div><strong>Exportar JSON</strong><small>Respaldo completo</small></div><b>›</b></button><label class="settings-action" for="import-json"><span>⇧</span><div><strong>Importar JSON</strong><small>Compatible con versiones anteriores</small></div><b>›</b></label><input type="file" id="import-json" accept="application/json,.json" hidden><button class="settings-action" id="export-csv"><span>▦</span><div><strong>Exportar CSV</strong><small>Historial para planillas</small></div><b>›</b></button></article>
+        <article class="settings-group danger-zone"><h2>Zona de reinicio</h2><button class="settings-action" id="reset-today"><span>↻</span><div><strong>Reiniciar el día</strong><small>Pide confirmación</small></div><b>›</b></button><button class="settings-action danger" id="reset-all"><span>!</span><div><strong>Borrar TODO</strong><small>Confirmación reforzada</small></div><b>›</b></button></article>
+        <article class="install-card"><span>▣</span><div><strong>Instala Kai en tu iPhone</strong><p>En Safari: Compartir → Añadir a pantalla de inicio.</p></div></article>
+        <p class="app-version">KAI — OPERACIÓN IRLANDA · v4.0.0<br>Chile → Irlanda</p>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegación principal">
-      <button class="nav-item active" data-view="today"><span>🎯</span><small>Hoy</small></button>
-      <button class="nav-item" data-view="progress"><span>📈</span><small>Progreso</small></button>
-      <button class="nav-item" data-view="calendar"><span>🗓️</span><small>Calendario</small></button>
-      <button class="nav-item" data-view="settings"><span>⚙️</span><small>Ajustes</small></button>
-    </nav>
+    <nav class="bottom-nav" aria-label="Navegación principal"><button class="nav-item active" data-view="today"><span>⌂</span><small>Hoy</small></button><button class="nav-item" data-view="progress"><span>▥</span><small>Progreso</small></button><button class="nav-item" data-view="calendar"><span>□</span><small>Calendario</small></button><button class="nav-item" data-view="settings"><span>⚙</span><small>Ajustes</small></button></nav>
   </div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="celebration" class="celebration" aria-live="polite"><i>✦</i><strong>PERFECT DAY ✨</strong><span>✦ · ✧ · ✦</span></div>
-  <div id="achievement-modal" class="modal" aria-hidden="true"><div class="modal-card"><div class="achievement-burst">🏆</div><p class="eyebrow">LOGRO DESBLOQUEADO</p><h2 id="achievement-title"></h2><p id="achievement-description"></p><button id="close-achievement" class="primary-button">Vamos con todo</button></div></div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"><span id="toast-message"></span><button id="undo-action">DESHACER</button></div>
+  <div id="celebration" class="celebration" aria-live="polite"><span>✦</span><strong>PERFECT DAY ✨</strong><b>DÍA GANADO · +20 XP</b><p>6/6. Día cerrado. Mañana repetimos.</p></div>
+  <div id="checkin-modal" class="modal" aria-hidden="true"><div class="modal-card checkin-card"><button class="modal-close" data-close-checkin aria-label="Ahora no">×</button><p class="modal-kicker">CHECK-IN DE HOY</p><div id="checkin-sleep"><h2>¿Dormiste 7–8 horas?</h2><p>Una respuesta. Sin horarios ni culpa.</p><div class="choice-row"><button data-sleep="true">Sí</button><button data-sleep="false">No</button></div></div><div id="checkin-energy" hidden><h2>¿Cómo llegaste hoy?</h2><div class="energy-grid"><button data-energy="low">😴<span>Muerto</span></button><button data-energy="normal">🙂<span>Normal</span></button><button data-energy="high">⚡<span>Con todo</span></button></div></div><button class="later-button" data-close-checkin>Ahora no</button></div></div>
+  <div id="delete-modal" class="modal" aria-hidden="true"><div class="modal-card delete-card"><p class="modal-kicker danger-text">ACCIÓN IRREVERSIBLE</p><h2>Borrar todo el progreso</h2><p>Escribe <strong>BORRAR</strong> para confirmar.</p><input id="delete-confirmation" autocomplete="off" placeholder="BORRAR"><div class="modal-actions"><button id="cancel-delete">Cancelar</button><button id="confirm-delete" disabled>Borrar todo</button></div></div></div>
+  <div id="achievement-modal" class="modal" aria-hidden="true"><div class="modal-card achievement-modal"><div id="achievement-icon">🏆</div><p class="modal-kicker">LOGRO DESBLOQUEADO</p><h2 id="achievement-title"></h2><p id="achievement-description"></p><button id="close-achievement" class="primary-button">Listo</button></div></div>
+  <aside id="update-banner" class="update-banner" aria-live="polite"><span>Nueva versión disponible</span><button id="apply-update">ACTUALIZAR</button></aside>
   <script src="./app.js" defer></script>
 </body>
 </html>
