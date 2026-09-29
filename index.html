@@ -11,17 +11,34 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon.svg">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css?v=4.0.2">
+  <link rel="stylesheet" href="./styles.css?v=4.1.0">
+  <link rel="stylesheet" href="./v41.css?v=4.1.0">
   <title>Kai — Operación Irlanda</title>
 </head>
 <body>
   <div class="app-shell">
     <main>
       <section class="view active" id="view-today" aria-label="Hoy">
-        <header class="hero">
-          <div class="hero-copy"><p>OPERACIÓN IRLANDA <span aria-hidden="true">🇮🇪</span></p><h1>Disciplina hoy.<br>Libertad mañana.</h1></div>
+        <header class="hero hero-v41">
+          <div class="hero-topline">
+            <div class="hero-brand">
+              <p>OPERACIÓN IRLANDA</p>
+              <span>Chile → Irlanda · 2 NOV 2026</span>
+            </div>
+            <div class="flag-orbit" aria-label="Bandera de Irlanda">🇮🇪</div>
+          </div>
+
+          <div class="hero-main">
+            <div class="hero-countdown">
+              <strong id="days-left">—</strong>
+              <span>días para Irlanda</span>
+            </div>
+            <div class="hero-copy">
+              <h1>Disciplina hoy.<br><em>Libertad mañana.</em></h1>
+            </div>
+          </div>
+
           <div class="hero-metrics">
-            <div><strong id="days-left">—</strong><span>DÍAS PARA IRLANDA</span></div>
             <div><strong id="daily-percent">0%</strong><span>PROGRESO HOY</span></div>
             <div><strong id="hero-xp">0 XP</strong><span id="hero-level">NIVEL 1</span></div>
             <div><strong><b id="hero-streak">0</b> días</strong><span>RACHA ACTUAL</span></div>
@@ -34,6 +51,19 @@
           <p id="kai-message"></p>
           <button id="next-mission" class="next-mission"><span class="target">◎</span><span><small>SIGUIENTE MISIÓN</small><strong id="next-mission-label">Hacer la cama</strong></span><b>›</b></button>
         </article>
+
+        <section class="motivation-card" id="motivation-card" aria-label="Impulso del día">
+          <div class="motivation-header">
+            <span class="motivation-kicker"><i aria-hidden="true"></i> IMPULSO DEL DÍA</span>
+            <span class="motivation-theme" id="motivation-theme">DISCIPLINA</span>
+          </div>
+          <p class="motivation-text" id="motivation-text">“Una misión a la vez.”</p>
+          <div class="motivation-actions">
+            <button type="button" id="motivation-favorite" aria-pressed="false">♡ GUARDAR</button>
+            <button type="button" id="motivation-next">OTRA</button>
+            <button type="button" id="motivation-open-favorites" class="favorites-button">GUARDADAS · <b id="motivation-favorites-count">0</b></button>
+          </div>
+        </section>
 
         <section class="content-card habits-section">
           <div class="section-title"><div><p>☀︎ &nbsp;HÁBITOS ESENCIALES</p><h2>Gana el día</h2></div><span id="daily-count">0 / 6</span></div>
@@ -76,11 +106,16 @@
         <article class="settings-group"><h2>Datos y respaldo</h2><div class="backup-status"><span>Último respaldo</span><strong id="last-backup">Nunca</strong><small id="backup-warning"></small></div><button class="settings-action" id="export-json"><span>⇩</span><div><strong>Exportar JSON</strong><small>Respaldo completo</small></div><b>›</b></button><label class="settings-action" for="import-json"><span>⇧</span><div><strong>Importar JSON</strong><small>Compatible con versiones anteriores</small></div><b>›</b></label><input type="file" id="import-json" accept="application/json,.json" hidden><button class="settings-action" id="export-csv"><span>▦</span><div><strong>Exportar CSV</strong><small>Historial para planillas</small></div><b>›</b></button></article>
         <article class="settings-group danger-zone"><h2>Zona de reinicio</h2><button class="settings-action" id="reset-today"><span>↻</span><div><strong>Reiniciar el día</strong><small>Pide confirmación</small></div><b>›</b></button><button class="settings-action danger" id="reset-all"><span>!</span><div><strong>Borrar TODO</strong><small>Confirmación reforzada</small></div><b>›</b></button></article>
         <article class="install-card"><span>▣</span><div><strong>Instala Kai en tu iPhone</strong><p>En Safari: Compartir → Añadir a pantalla de inicio.</p></div></article>
-        <p class="app-version">KAI — OPERACIÓN IRLANDA · v4.0.2<br>Chile → Irlanda</p>
+        <p class="app-version">KAI — OPERACIÓN IRLANDA · v4.1.0<br>Chile → Irlanda</p>
       </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegación principal"><button class="nav-item active" data-view="today"><span>⌂</span><small>Hoy</small></button><button class="nav-item" data-view="progress"><span>▥</span><small>Progreso</small></button><button class="nav-item" data-view="calendar"><span>□</span><small>Calendario</small></button><button class="nav-item" data-view="settings"><span>⚙</span><small>Ajustes</small></button></nav>
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button class="nav-item active" data-view="today" aria-label="Hoy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2v8.3a.5.5 0 0 1-.5.5h-5.2v-5.8H9.2V20H4a.5.5 0 0 1-.5-.5z"/></svg><small>Hoy</small></button>
+      <button class="nav-item" data-view="progress" aria-label="Progreso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V13M12 19V9M19 19V5"/></svg><small>Progreso</small></button>
+      <button class="nav-item" data-view="calendar" aria-label="Calendario"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2"/><path d="M8 3.5v4M16 3.5v4M4 9.5h16"/></svg><small>Calendario</small></button>
+      <button class="nav-item" data-view="settings" aria-label="Ajustes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 5v4M8 15v4"/></svg><small>Ajustes</small></button>
+    </nav>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"><span id="toast-message"></span><button id="undo-action">DESHACER</button></div>
@@ -88,7 +123,11 @@
   <div id="checkin-modal" class="modal" aria-hidden="true"><div class="modal-card checkin-card"><button class="modal-close" data-close-checkin aria-label="Ahora no">×</button><p class="modal-kicker">CHECK-IN DE HOY</p><div id="checkin-sleep"><h2>¿Dormiste 7–8 horas?</h2><p>Una respuesta. Sin horarios ni culpa.</p><div class="choice-row"><button data-sleep="true">Sí</button><button data-sleep="false">No</button></div></div><div id="checkin-energy" hidden><h2>¿Cómo llegaste hoy?</h2><div class="energy-grid"><button data-energy="low">😴<span>Muerto</span></button><button data-energy="normal">🙂<span>Normal</span></button><button data-energy="high">⚡<span>Con todo</span></button></div></div><button class="later-button" data-close-checkin>Ahora no</button></div></div>
   <div id="delete-modal" class="modal" aria-hidden="true"><div class="modal-card delete-card"><p class="modal-kicker danger-text">ACCIÓN IRREVERSIBLE</p><h2>Borrar todo el progreso</h2><p>Escribe <strong>BORRAR</strong> para confirmar.</p><input id="delete-confirmation" autocomplete="off" placeholder="BORRAR"><div class="modal-actions"><button id="cancel-delete">Cancelar</button><button id="confirm-delete" disabled>Borrar todo</button></div></div></div>
   <div id="achievement-modal" class="modal" aria-hidden="true"><div class="modal-card achievement-modal"><div id="achievement-icon">🏆</div><p class="modal-kicker">LOGRO DESBLOQUEADO</p><h2 id="achievement-title"></h2><p id="achievement-description"></p><button id="close-achievement" class="primary-button">Listo</button></div></div>
-  <aside id="update-banner" class="update-banner" aria-live="polite"><span>Nueva versión disponible</span><button id="apply-update">ACTUALIZAR</button></aside>
-  <script src="./app.js?v=4.0.2" defer></script>
+  <div id="motivation-modal" class="modal" aria-hidden="true"><div class="modal-card motivation-modal-card"><button class="modal-close" data-close-motivation aria-label="Cerrar">×</button><p class="modal-kicker">IMPULSOS GUARDADOS</p><h2>Frases que te sirven.</h2><p>Sin XP, sin presión. Solo las que quieras volver a leer.</p><p id="motivation-favorites-empty">Todavía no guardaste ninguna.</p><div id="motivation-favorites-list"></div></div></div>
+  <aside id="update-banner" class="update-banner" aria-live="polite" aria-hidden="true"><span>Nueva versión disponible</span><button id="apply-update">ACTUALIZAR</button></aside>
+
+  <script src="./app.js?v=4.1.0" defer></script>
+  <script src="./v41-core.js?v=4.1.0" defer></script>
+  <script src="./v41.js?v=4.1.0" defer></script>
 </body>
 </html>
