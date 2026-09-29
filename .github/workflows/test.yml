@@ -1,0 +1,27 @@
+name: Kai checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Syntax
+        run: |
+          node --check app.js
+          node --check v41-core.js
+          node --check v41.js
+          node --check sw.js
+      - name: Logic tests
+        run: |
+          node tests/app.test.js
+          node tests/v41-core.test.js
+      - name: Manifest JSON
+        run: python3 -m json.tool manifest.webmanifest > /dev/null

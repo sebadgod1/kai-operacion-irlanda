@@ -1,10 +1,13 @@
 const CACHE_PREFIX = 'kai-irlanda-';
-const CACHE = `${CACHE_PREFIX}shell-v4.0.2`;
+const CACHE = `${CACHE_PREFIX}shell-v4.1.0`;
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?v=4.0.2',
-  './app.js?v=4.0.2',
+  './styles.css?v=4.1.0',
+  './v41.css?v=4.1.0',
+  './app.js?v=4.1.0',
+  './v41-core.js?v=4.1.0',
+  './v41.js?v=4.1.0',
   './manifest.webmanifest',
   './icon.svg',
   './assets/ireland-hero.svg'
