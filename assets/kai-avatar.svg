@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Kai, zorro guía</title>
+  <desc id="desc">Avatar minimalista de un zorro con sudadera oscura y aro cian.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102b42"/>
+      <stop offset="1" stop-color="#071521"/>
+    </linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f47a2f"/>
+      <stop offset="1" stop-color="#c84f23"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="122" fill="url(#bg)" stroke="#32c9ef" stroke-width="8"/>
+  <path d="M42 207c15-37 47-59 86-59s71 22 86 59v23H42z" fill="#0b1526"/>
+  <path d="M71 88 82 37l40 32M185 88l-11-51-40 32" fill="#d95b27" stroke="#2a1520" stroke-width="8" stroke-linejoin="round"/>
+  <path d="m83 60 17 31-24-9zM173 60l-17 31 24-9z" fill="#f7d9c4"/>
+  <path d="M128 55c-45 0-73 31-73 77 0 48 31 77 73 77s73-29 73-77c0-46-28-77-73-77z" fill="url(#fur)"/>
+  <path d="M72 137c8 25 29 43 56 43s48-18 56-43c-12 11-28 16-56 16s-44-5-56-16z" fill="#fff0df"/>
+  <ellipse cx="104" cy="119" rx="12" ry="9" fill="#101722"/>
+  <ellipse cx="152" cy="119" rx="12" ry="9" fill="#101722"/>
+  <circle cx="108" cy="116" r="3" fill="#ffffff"/>
+  <circle cx="156" cy="116" r="3" fill="#ffffff"/>
+  <path d="M118 140c5-5 15-5 20 0-2 9-7 13-10 13s-8-4-10-13z" fill="#1b1720"/>
+  <path d="M128 153c-5 8-13 12-24 12M128 153c5 8 13 12 24 12" fill="none" stroke="#5e2a22" stroke-width="4" stroke-linecap="round"/>
+  <path d="M76 196c15-17 32-25 52-25s37 8 52 25" fill="none" stroke="#32c9ef" stroke-opacity=".65" stroke-width="4"/>
+  <path d="M185 74c10 7 18 17 24 29" fill="none" stroke="#32c9ef" stroke-width="5" stroke-linecap="round" opacity=".75"/>
+</svg>
