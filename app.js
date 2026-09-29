@@ -42,7 +42,10 @@ const ACHIEVEMENTS = [
   { id: 'english1000', icon: '🗣️', name: 'English 1000', description: '1.000 minutos reales de inglés.', test: s => totalMinutes('english', s) >= 1000 },
   { id: 'reading300', icon: '📖', name: 'Lectura 300', description: '300 minutos reales de lectura.', test: s => totalMinutes('reading', s) >= 300 },
   { id: 'training10', icon: '🏅', name: '10 entrenamientos', description: 'Diez sesiones registradas.', test: s => trainingCount(s) >= 10 },
-  { id: 'training30', icon: '🏋️', name: '30 entrenamientos', description: 'Treinta sesiones registradas.', test: s => trainingCount(s) >= 30 }
+  { id: 'training30', icon: '🏋️', name: '30 entrenamientos', description: 'Treinta sesiones registradas.', test: s => trainingCount(s) >= 30 },
+  { id: 'english5', icon: '🇬🇧', name: 'No more excuses', description: 'Logro histórico: cinco sesiones de inglés.', legacy: true, test: () => false },
+  { id: 'streak7', icon: '🔥', name: 'Una semana firme', description: 'Logro histórico: siete días ganados consecutivos.', legacy: true, test: () => false },
+  { id: 'xp1000', icon: '💎', name: 'Imparable', description: 'Logro histórico: 1.000 XP alcanzados.', legacy: true, test: () => false }
 ];
 const SKILLS = [
   { name: '🇬🇧 English', unit: 'min', milestones: [150, 300, 600, 1200, 2400], value: s => totalMinutes('english', s) },
@@ -65,12 +68,12 @@ function dateKey(date = new Date()) { const y = date.getFullYear(); const m = St
 function parseDate(key) { const [y, m, d] = String(key).split('-').map(Number); return new Date(y, m - 1, d); }
 function daysBetween(from, to) { if (!from || !to) return 0; return Math.max(0, Math.round((parseDate(to) - parseDate(from)) / 86400000)); }
 function emptyState() { return { version: 4, days: {}, achievements: [], meta: { lastOpenedDate: null, lastBackupAt: null, recentKaiMessages: [] } }; }
-function emptyDay() { return { habits: {}, minutes: { english: 0, reading: 0 }, trainings: [], reflection: '', checkIn: {} }; }
+function emptyDay() { return { habits: {}, minutes: { english: 0, reading: 0 }, trainings: [], reflection: '', checkIn: {}, kai: {} }; }
 function clampMinutes(value) { return Math.min(1440, Math.max(0, Math.round(Number(value) || 0))); }
 function normalizeTrainings(value) {
-  if (Array.isArray(value)) return value.filter(id => TRAININGS.some(t => t.id === id));
+  if (Array.isArray(value)) return [...new Set(value.filter(id => TRAININGS.some(t => t.id === id)))];
   if (!value || typeof value !== 'object') return [];
-  return Object.entries(value).flatMap(([id, count]) => TRAININGS.some(t => t.id === id) ? Array(Math.max(0, Number.isFinite(+count) ? Math.round(+count) : count ? 1 : 0)).fill(id) : []);
+  return Object.entries(value).filter(([id, count]) => TRAININGS.some(t => t.id === id) && Boolean(count)).map(([id]) => id);
 }
 function normalizeState(raw) {
   const clean = emptyState();
@@ -84,10 +87,12 @@ function normalizeState(raw) {
     HABITS.filter(h => !h.goal).forEach(h => { habits[h.id] = Boolean(source[h.id] ?? value[h.id]); });
     const minutes = {};
     HABITS.filter(h => h.goal).forEach(h => { minutes[h.id] = clampMinutes(sourceMinutes[h.id] ?? value[`${h.id}Minutes`] ?? ((source[h.id] ?? value[h.id]) ? h.goal : 0)); });
-    const checkIn = value.checkIn && typeof value.checkIn === 'object' ? { sleep: typeof value.checkIn.sleep === 'boolean' ? value.checkIn.sleep : undefined, energy: ['low', 'normal', 'high'].includes(value.checkIn.energy) ? value.checkIn.energy : undefined, completedAt: value.checkIn.completedAt || undefined } : {};
-    clean.days[key] = { habits, minutes, trainings: normalizeTrainings(value.trainings || value.workouts), reflection: String(value.reflection || value.note || ''), checkIn };
+    const checkIn = value.checkIn && typeof value.checkIn === 'object' ? { sleep: typeof value.checkIn.sleep === 'boolean' ? value.checkIn.sleep : undefined, energy: ['low', 'normal', 'high'].includes(value.checkIn.energy) ? value.checkIn.energy : undefined, completedAt: value.checkIn.completedAt || undefined, dismissedAt: value.checkIn.dismissedAt || undefined } : {};
+    const kai = value.kai && typeof value.kai === 'object' ? { context: String(value.kai.context || ''), message: String(value.kai.message || ''), event: value.kai.event && typeof value.kai.event === 'object' ? value.kai.event : undefined } : {};
+    clean.days[key] = { habits, minutes, trainings: normalizeTrainings(value.trainings || value.workouts), reflection: String(value.reflection || value.note || ''), checkIn, kai };
   });
-  clean.achievements = Array.isArray(raw.achievements) ? [...new Set(raw.achievements.filter(id => ACHIEVEMENTS.some(a => a.id === id)))] : [];
+  const achievementAliases = { perfect: 'firstVictory', athlete: 'training10' };
+  clean.achievements = Array.isArray(raw.achievements) ? [...new Set(raw.achievements.map(id => achievementAliases[id] || id).filter(id => ACHIEVEMENTS.some(a => a.id === id)))] : [];
   const meta = raw.meta && typeof raw.meta === 'object' ? raw.meta : {};
   clean.meta = { lastOpenedDate: /^\d{4}-\d{2}-\d{2}$/.test(meta.lastOpenedDate) ? meta.lastOpenedDate : null, lastBackupAt: meta.lastBackupAt || raw.lastBackupAt || null, recentKaiMessages: Array.isArray(meta.recentKaiMessages) ? meta.recentKaiMessages.slice(-8).map(String) : [] };
   return clean;
@@ -141,7 +146,36 @@ function pickKaiMessage(group) {
   state.meta.recentKaiMessages = [...recent, message].slice(-8);
   return message;
 }
-function kaiMessage(record) { const done = completedFor(record); if (absenceDays >= 2) return pickKaiMessage('return'); if ((record.minutes?.english || 0) >= 60) return pickKaiMessage('englishExtra'); if ((record.minutes?.reading || 0) >= 40) return pickKaiMessage('readingExtra'); if (done === 6) return pickKaiMessage('complete'); if (done === 5) return pickKaiMessage('almost'); if (done >= 3) return pickKaiMessage('middle'); if (done >= 1) return pickKaiMessage('early'); return pickKaiMessage('start'); }
+function baseKaiContext(record) {
+  const done = completedFor(record);
+  if (absenceDays >= 2) return 'return';
+  if (done === 6) return 'complete';
+  if (done === 5) return 'almost';
+  if (done >= 3) return 'middle';
+  if (done >= 1) return 'early';
+  return 'start';
+}
+function setKaiEvent(context, delay = 0) {
+  const record = day();
+  record.kai ||= {};
+  const protectedDelay = ['almost', 'complete'].includes(baseKaiContext(record)) ? 2100 : 0;
+  const showDelay = Math.max(delay, protectedDelay);
+  record.kai.event = { context, message: pickKaiMessage(context), createdAt: Date.now(), showAfter: Date.now() + showDelay, expiresAt: Date.now() + showDelay + 120000 };
+  if (showDelay) setTimeout(() => { renderToday(); saveState(); }, showDelay + 20);
+}
+function kaiMessage(record) {
+  record.kai ||= {};
+  const base = baseKaiContext(record);
+  const event = record.kai.event;
+  const eventVisible = event && Date.now() >= Number(event.showAfter || 0) && Date.now() < Number(event.expiresAt || 0);
+  const context = eventVisible ? event.context : base;
+  if (eventVisible) return event.message;
+  if (record.kai.context !== context || !record.kai.message) {
+    record.kai.context = context;
+    record.kai.message = pickKaiMessage(context);
+  }
+  return record.kai.message;
+}
 function recommendedMission(record) {
   const pending = HABITS.filter(h => !habitDone(record, h.id));
   if (pending.length === 1) return { type: 'habit', id: pending[0].id, label: pending[0].goal ? `${pending[0].name} ${pending[0].goal} min` : pending[0].name };
@@ -179,16 +213,46 @@ function renderToday() {
   const start = startOfWeek(); const end = new Date(start); end.setDate(end.getDate() + 6); document.querySelector('#week-label').textContent = `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString('es-CL', { month: 'short' })}`;
   saveState();
 }
+function trainingStatus(training, count) {
+  if (count < training.goal) return { label: 'META', xp: `+${training.xp} XP` };
+  if (count === training.goal) return { label: 'META COMPLETA · EXTRA DISPONIBLE', xp: `próxima +${training.extra} XP` };
+  if (count === training.goal + 1) return { label: 'EXTRA COMPLETADO', xp: `+${training.extra} XP` };
+  return { label: 'EXTRA COMPLETADO', xp: 'sesiones posteriores · 0 XP adicional' };
+}
 function renderTrainings() {
-  document.querySelector('#training-list').innerHTML = TRAININGS.map(training => { const count = weeklyCount(training.id); const mode = count < training.goal ? 'META' : count === training.goal ? 'EXTRA DISPONIBLE' : 'EXTRA'; return `<article class="training-card"><div class="training-main"><span>${training.icon}</span><div class="training-copy"><strong>${training.name}</strong><small>${mode} · ${count < training.goal ? `+${training.xp} XP` : count === training.goal ? `+${training.extra} XP (solo una)` : '0 XP adicional'}</small></div><strong class="training-count">${count} / ${training.goal}</strong><button class="training-add" data-training="${training.id}" aria-label="Registrar ${training.name}">+</button></div><div class="progress-track"><span style="width:${Math.min(100, count / training.goal * 100)}%"></span></div></article>`; }).join('');
-  document.querySelectorAll('[data-training]').forEach(button => button.addEventListener('click', () => addTraining(button.dataset.training)));
+  const today = normalizeTrainings(day().trainings);
+  document.querySelector('#training-list').innerHTML = TRAININGS.map(training => { const count = weeklyCount(training.id); const status = trainingStatus(training, count); const doneToday = today.includes(training.id); return `<article class="training-card" id="training-${training.id}"><div class="training-main"><span>${training.icon}</span><div class="training-copy"><strong>${training.name}</strong><small>${status.label} · ${status.xp}</small></div><strong class="training-count">${count} / ${training.goal}</strong><button class="training-add ${doneToday ? 'done' : ''}" data-training="${training.id}" aria-pressed="${doneToday}" aria-label="${doneToday ? 'Eliminar' : 'Registrar'} ${training.name}">${doneToday ? 'Hecho ✓' : '+ Registrar'}</button></div><div class="progress-track"><span style="width:${Math.min(100, count / training.goal * 100)}%"></span></div></article>`; }).join('');
+  document.querySelectorAll('[data-training]').forEach(button => button.addEventListener('click', () => toggleTraining(button.dataset.training)));
 }
 function renderTrainingWeek() { const start = startOfWeek(); document.querySelector('#training-week').innerHTML = Array.from({ length: 7 }, (_, index) => { const date = new Date(start); date.setDate(date.getDate() + index); const sessions = normalizeTrainings(state.days[dateKey(date)]?.trainings); const icons = sessions.map(id => TRAININGS.find(t => t.id === id)?.icon).join(''); return `<div class="training-day"><strong>${['L', 'M', 'X', 'J', 'V', 'S', 'D'][index]}</strong><span>${icons || '·'}</span></div>`; }).join(''); }
 
-function withUndo(message, mutate, restore) { mutate(); saveState(); checkAchievements(); renderAll(); showToast(message, () => { restore(); saveState(); renderAll(); }); }
-function toggleHabit(id) { const record = day(); const previous = Boolean(record.habits[id]); const wasPerfect = completedFor(record) === 6; withUndo(previous ? 'Misión desmarcada' : 'Misión completada ✓', () => { record.habits[id] = !previous; }, () => { record.habits[id] = previous; }); if (!wasPerfect && completedFor(record) === 6) celebrate('PERFECT DAY ✨', 'DÍA GANADO · +20 XP'); }
-function setMinutes(id, raw) { const record = day(); const previous = record.minutes[id] || 0; const next = clampMinutes(raw); const wasPerfect = completedFor(record) === 6; withUndo(`${next} min guardados ✓`, () => { record.minutes[id] = next; }, () => { record.minutes[id] = previous; }); if (!wasPerfect && completedFor(record) === 6) celebrate('PERFECT DAY ✨', 'DÍA GANADO · +20 XP'); }
-function addTraining(id) { const record = day(); const previous = [...normalizeTrainings(record.trainings)]; const weekWasWon = wonWeeks().includes(weekKey()); const training = TRAININGS.find(t => t.id === id); const willBeExtra = weeklyCount(id) >= training.goal; withUndo('Entrenamiento registrado ✓', () => { record.trainings = [...previous, id]; }, () => { record.trainings = previous; }); if (willBeExtra) { state.meta.recentKaiMessages.push(pickKaiMessage('trainingExtra')); saveState(); } if (!weekWasWon && wonWeeks().includes(weekKey())) celebrate('PERFECT WEEK 🏆', 'SEMANA GANADA · +50 XP'); }
+function cloneState(value = state) { return JSON.parse(JSON.stringify(value)); }
+function clearTransientFeedback() { closeModal('#achievement-modal'); const celebration = document.querySelector('#celebration'); celebration.classList.remove('show'); }
+function withTransaction(message, mutate, after) {
+  const snapshot = cloneState();
+  mutate();
+  saveState();
+  const unlocked = checkAchievements();
+  renderAll();
+  if (after) after(unlocked);
+  showToast(message, () => { state = snapshot; saveState(); clearTransientFeedback(); renderAll(); });
+}
+function maybeSetStreakEvent(previousBest) {
+  const streak = streaks();
+  if ([4, 7].includes(streak.current) || streak.best > previousBest) setKaiEvent('streak', 2100);
+}
+function toggleHabit(id) {
+  const previous = Boolean(day().habits[id]); const wasPerfect = completedFor(day()) === 6; const previousBest = streaks().best;
+  withTransaction(previous ? 'Misión desmarcada' : 'Misión completada ✓', () => { day().habits[id] = !previous; if (!wasPerfect && completedFor(day()) === 6) maybeSetStreakEvent(previousBest); }, () => { if (!wasPerfect && completedFor(day()) === 6) celebrate('PERFECT DAY ✨', 'DÍA GANADO · +20 XP'); });
+}
+function setMinutes(id, raw) {
+  const previous = day().minutes[id] || 0; const next = clampMinutes(raw); const wasPerfect = completedFor(day()) === 6; const previousBest = streaks().best;
+  withTransaction(`${next} min guardados ✓`, () => { day().minutes[id] = next; if (id === 'english' && previous < 60 && next >= 60) setKaiEvent('englishExtra'); if (id === 'reading' && previous < 40 && next >= 40) setKaiEvent('readingExtra'); if (!wasPerfect && completedFor(day()) === 6) maybeSetStreakEvent(previousBest); }, () => { if (!wasPerfect && completedFor(day()) === 6) celebrate('PERFECT DAY ✨', 'DÍA GANADO · +20 XP'); });
+}
+function toggleTraining(id) {
+  const sessions = normalizeTrainings(day().trainings); const exists = sessions.includes(id); const weekWasWon = wonWeeks().includes(weekKey()); const countBefore = weeklyCount(id); const training = TRAININGS.find(t => t.id === id);
+  withTransaction(exists ? 'Entrenamiento eliminado' : 'Entrenamiento registrado ✓', () => { day().trainings = exists ? sessions.filter(session => session !== id) : [...sessions, id]; if (!exists && countBefore === training.goal) setKaiEvent('trainingExtra'); }, () => { if (!weekWasWon && wonWeeks().includes(weekKey())) celebrate('PERFECT WEEK 🏆', 'SEMANA GANADA · +50 XP'); });
+}
 
 function renderProgress() {
   const xp = calculateXP(); const level = levelData(xp); const daily = streaks(); const weekly = weeklyStreaks();
@@ -198,7 +262,7 @@ function renderProgress() {
   document.querySelector('#skills-list').innerHTML = SKILLS.map(skill => { const value = skill.value(state); const nextIndex = skill.milestones.findIndex(m => value < m); const levelNumber = nextIndex === -1 ? skill.milestones.length : nextIndex; const previous = levelNumber === 0 ? 0 : skill.milestones[levelNumber - 1]; const next = nextIndex === -1 ? skill.milestones.at(-1) : skill.milestones[nextIndex]; const progress = nextIndex === -1 ? 100 : Math.max(0, (value - previous) / (next - previous) * 100); return `<article class="skill"><div class="skill-head"><strong>${skill.name}</strong><span>Nivel ${levelNumber}${nextIndex === -1 ? ' · máximo' : ''}</span></div><div class="skill-data">${value.toLocaleString('es-CL')} ${skill.unit}${nextIndex === -1 ? '' : ` · próximo hito: ${next}`}</div><div class="progress-track"><span style="width:${progress}%"></span></div></article>`; }).join('');
   document.querySelector('#achievements-list').innerHTML = ACHIEVEMENTS.map(achievement => { const unlocked = state.achievements.includes(achievement.id) || achievement.test(state); return `<article class="achievement ${unlocked ? 'unlocked' : ''}"><span>${unlocked ? achievement.icon : '◌'}</span><strong>${achievement.name}</strong><small>${achievement.description}</small></article>`; }).join('');
 }
-function checkAchievements() { const unlocked = ACHIEVEMENTS.filter(a => !state.achievements.includes(a.id) && a.test(state)); if (!unlocked.length) return; state.achievements.push(...unlocked.map(a => a.id)); saveState(); showAchievement(unlocked[0]); }
+function checkAchievements() { const unlocked = ACHIEVEMENTS.filter(a => !a.legacy && !state.achievements.includes(a.id) && a.test(state)); if (!unlocked.length) return []; state.achievements.push(...unlocked.map(a => a.id)); saveState(); showAchievement(unlocked[0]); return unlocked; }
 function showAchievement(achievement) { document.querySelector('#achievement-icon').textContent = achievement.icon; document.querySelector('#achievement-title').textContent = achievement.name; document.querySelector('#achievement-description').textContent = achievement.description; openModal('#achievement-modal'); }
 function renderCalendar() { const year = calendarDate.getFullYear(); const month = calendarDate.getMonth(); document.querySelector('#calendar-month').textContent = new Date(year, month, 1).toLocaleDateString('es-CL', { month: 'long', year: 'numeric' }); let html = '<span></span>'.repeat((new Date(year, month, 1).getDay() + 6) % 7); for (let number = 1; number <= new Date(year, month + 1, 0).getDate(); number += 1) { const key = dateKey(new Date(year, month, number)); const record = state.days[key]; const done = completedFor(record); const status = record ? (done === 6 ? 'great' : done >= 3 ? 'partial' : 'low') : ''; html += `<button class="calendar-day ${status} ${key === currentDate ? 'today' : ''} ${key === selectedCalendarDate ? 'selected' : ''}" data-date="${key}">${number}</button>`; } document.querySelector('#calendar-grid').innerHTML = html; document.querySelectorAll('.calendar-day').forEach(button => button.addEventListener('click', () => { selectedCalendarDate = button.dataset.date; renderCalendar(); renderDayDetail(selectedCalendarDate); })); }
 function renderDayDetail(key) { const box = document.querySelector('#day-detail'); const record = state.days[key]; if (!record) { box.className = 'day-detail empty'; box.innerHTML = '<p>Sin registro. No creamos días vacíos por ausencia.</p>'; return; } const trainings = normalizeTrainings(record.trainings); box.className = 'day-detail'; box.innerHTML = `<h3>${parseDate(key).toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })} · ${completedFor(record) === 6 ? 'Día ganado ✨' : `${completedFor(record)}/6`}</h3><div class="detail-habits">${HABITS.map(h => `<span class="${habitDone(record, h.id) ? 'done' : ''}">${habitDone(record, h.id) ? '✓' : '○'} ${h.icon} ${h.name}</span>`).join('')}</div><p class="detail-meta">🇬🇧 Inglés: ${record.minutes?.english || 0} min<br>📖 Lectura: ${record.minutes?.reading || 0} min<br>Entrenamiento: ${trainings.length ? trainings.map(id => TRAININGS.find(t => t.id === id)?.name).join(', ') : 'Sin sesiones'}</p>${record.reflection ? `<blockquote>${escapeHTML(record.reflection)}</blockquote>` : ''}`; }
@@ -214,27 +278,31 @@ function download(name, content, type) { const blob = new Blob([content], { type
 function exportJSON() { state.meta.lastBackupAt = new Date().toISOString(); saveState(); download(`kai-irlanda-backup-${currentDate}.json`, JSON.stringify({ ...state, exportedAt: state.meta.lastBackupAt }, null, 2), 'application/json'); renderSettings(); showToast('Backup exportado ✓'); }
 function exportCSV() { const header = ['fecha', ...HABITS.map(h => h.id), 'english_minutes', 'reading_minutes', ...TRAININGS.map(t => t.id), 'dia_ganado', 'reflexion']; const quote = value => `"${String(value).replaceAll('"', '""')}"`; const rows = Object.keys(state.days).sort().map(key => { const record = state.days[key]; const sessions = normalizeTrainings(record.trainings); return [key, ...HABITS.map(h => habitDone(record, h.id) ? 1 : 0), record.minutes?.english || 0, record.minutes?.reading || 0, ...TRAININGS.map(t => sessions.filter(id => id === t.id).length), completedFor(record) === 6 ? 1 : 0, record.reflection || ''].map(quote).join(','); }); download(`kai-irlanda-historial-${currentDate}.csv`, `\ufeff${header.join(',')}\n${rows.join('\n')}`, 'text/csv;charset=utf-8'); showToast('Historial CSV exportado ✓'); }
 async function importJSON(event) { const file = event.target.files[0]; if (!file) return; try { const parsed = JSON.parse(await file.text()); const normalized = normalizeState(parsed.data || parsed); if (!Object.keys(normalized.days).length && !window.confirm('El archivo no contiene días guardados. ¿Importarlo igualmente?')) return; state = normalized; saveState(); renderAll(); showToast('Backup importado correctamente ✓'); } catch (error) { window.alert('No pudimos importar ese archivo. Revisa que sea un backup JSON válido.'); } finally { event.target.value = ''; } }
+function deleteAllData() { PREVIOUS_KEYS.forEach(key => localStorage.removeItem(key)); localStorage.removeItem(STORAGE_KEY); state = emptyState(); state.meta.lastOpenedDate = currentDate; saveState(); }
 function switchView(name) { document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.id === `view-${name}`)); document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.view === name)); window.scrollTo(0, 0); }
+function answerSleep(slept) { const record = day(); record.checkIn.sleep = Boolean(slept); record.habits.sleep = Boolean(slept); saveState(); renderToday(); prepareCheckIn(); }
 function finishCheckIn(energy) { const record = day(); record.checkIn.energy = energy; record.checkIn.completedAt = new Date().toISOString(); saveState(); closeModal('#checkin-modal'); renderAll(); showToast('Check-in guardado ✓'); }
-function maybeShowCheckIn() { if (!day().checkIn?.completedAt) setTimeout(() => openModal('#checkin-modal'), 450); }
+function prepareCheckIn() { const answeredSleep = typeof day().checkIn?.sleep === 'boolean'; document.querySelector('#checkin-sleep').hidden = answeredSleep; document.querySelector('#checkin-energy').hidden = !answeredSleep; }
+function dismissCheckIn() { day().checkIn.dismissedAt = new Date().toISOString(); saveState(); closeModal('#checkin-modal'); }
+function maybeShowCheckIn() { const checkIn = day().checkIn || {}; if (!checkIn.completedAt && !checkIn.dismissedAt) setTimeout(() => { prepareCheckIn(); openModal('#checkin-modal'); }, 450); }
 function detectDateChange() { const now = dateKey(); if (now !== currentDate) { currentDate = now; calendarDate = new Date(); absenceDays = daysBetween(state.meta.lastOpenedDate, currentDate); state.meta.lastOpenedDate = currentDate; saveState(); renderAll(); maybeShowCheckIn(); showToast('Nuevo día. Partamos simple.'); } }
 
 function bindEvents() {
   document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => switchView(button.dataset.view)));
-  document.querySelector('#next-mission').addEventListener('click', event => { const button = event.currentTarget; if (button.dataset.type === 'habit') document.querySelector(`#habit-${button.dataset.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); else if (button.dataset.type === 'training') document.querySelector(`[data-training="${button.dataset.id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  document.querySelector('#next-mission').addEventListener('click', event => { const button = event.currentTarget; const target = button.dataset.type === 'habit' ? document.querySelector(`#habit-${button.dataset.id}`) : button.dataset.type === 'training' ? document.querySelector(`#training-${button.dataset.id}`) : null; if (!target) return; target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.classList.remove('mission-highlight'); void target.offsetWidth; target.classList.add('mission-highlight'); setTimeout(() => target.classList.remove('mission-highlight'), 750); });
   document.querySelector('#reflection').addEventListener('input', event => { day().reflection = event.target.value; document.querySelector('#save-status').textContent = 'Guardando…'; clearTimeout(saveTimer); saveTimer = setTimeout(() => { saveState(); document.querySelector('#save-status').textContent = 'Guardado en este dispositivo ✓'; }, 350); });
   document.querySelector('#prev-month').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }); document.querySelector('#next-month').addEventListener('click', () => { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); });
   document.querySelector('#undo-action').addEventListener('click', () => { if (undoCallback) undoCallback(); hideToast(); showToast('Cambio deshecho'); });
-  document.querySelectorAll('[data-close-checkin]').forEach(button => button.addEventListener('click', () => closeModal('#checkin-modal')));
-  document.querySelectorAll('[data-sleep]').forEach(button => button.addEventListener('click', () => { const slept = button.dataset.sleep === 'true'; const record = day(); record.checkIn.sleep = slept; record.habits.sleep = slept; saveState(); renderToday(); document.querySelector('#checkin-sleep').hidden = true; document.querySelector('#checkin-energy').hidden = false; }));
+  document.querySelectorAll('[data-close-checkin]').forEach(button => button.addEventListener('click', dismissCheckIn));
+  document.querySelectorAll('[data-sleep]').forEach(button => button.addEventListener('click', () => answerSleep(button.dataset.sleep === 'true')));
   document.querySelectorAll('[data-energy]').forEach(button => button.addEventListener('click', () => finishCheckIn(button.dataset.energy)));
   document.querySelector('#close-achievement').addEventListener('click', () => closeModal('#achievement-modal'));
   document.querySelector('#export-json').addEventListener('click', exportJSON); document.querySelector('#export-csv').addEventListener('click', exportCSV); document.querySelector('#import-json').addEventListener('change', importJSON);
-  document.querySelector('#reset-today').addEventListener('click', () => { if (window.confirm('¿Reiniciar hábitos, entrenamientos y reflexión de hoy?')) { delete state.days[currentDate]; saveState(); renderAll(); maybeShowCheckIn(); showToast('Día reiniciado'); } });
+  document.querySelector('#reset-today').addEventListener('click', () => { if (window.confirm('¿Reiniciar hábitos, minutos, entrenamientos, reflexión y check-in de hoy?')) { delete state.days[currentDate]; saveState(); renderAll(); maybeShowCheckIn(); showToast('Día reiniciado'); } });
   document.querySelector('#reset-all').addEventListener('click', () => { document.querySelector('#delete-confirmation').value = ''; document.querySelector('#confirm-delete').disabled = true; openModal('#delete-modal'); });
   document.querySelector('#delete-confirmation').addEventListener('input', event => { document.querySelector('#confirm-delete').disabled = event.target.value !== 'BORRAR'; });
   document.querySelector('#cancel-delete').addEventListener('click', () => closeModal('#delete-modal'));
-  document.querySelector('#confirm-delete').addEventListener('click', () => { if (document.querySelector('#delete-confirmation').value !== 'BORRAR') return; state = emptyState(); state.meta.lastOpenedDate = currentDate; saveState(); closeModal('#delete-modal'); renderAll(); maybeShowCheckIn(); showToast('Datos eliminados'); });
+  document.querySelector('#confirm-delete').addEventListener('click', () => { if (document.querySelector('#delete-confirmation').value !== 'BORRAR') return; deleteAllData(); closeModal('#delete-modal'); renderAll(); maybeShowCheckIn(); showToast('Datos eliminados'); });
   document.querySelector('#apply-update').addEventListener('click', () => { pendingWorker?.postMessage({ type: 'SKIP_WAITING' }); });
 }
 function registerServiceWorker() {
