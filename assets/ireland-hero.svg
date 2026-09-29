@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Costa atlántica de Irlanda al anochecer</title>
+  <desc id="desc">Ilustración original de acantilados oscuros, océano y cielo atmosférico azul.</desc>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#102f4b"/><stop offset=".48" stop-color="#164c6b"/><stop offset="1" stop-color="#0a263d"/></linearGradient>
+    <linearGradient id="sea" x2="0" y2="1"><stop stop-color="#12445f"/><stop offset="1" stop-color="#061724"/></linearGradient>
+    <linearGradient id="cliff" x2=".6" y2="1"><stop stop-color="#213e43"/><stop offset=".38" stop-color="#102b31"/><stop offset="1" stop-color="#071820"/></linearGradient>
+    <linearGradient id="fade" x2="0" y2="1"><stop offset=".45" stop-color="#06111f" stop-opacity="0"/><stop offset="1" stop-color="#06111f" stop-opacity=".98"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="1200" height="720" fill="url(#sky)"/>
+  <path d="M0 118C155 70 250 147 382 104s233-78 375-22 264 15 443-32v235H0z" fill="#8bb2c2" opacity=".07" filter="url(#blur)"/>
+  <path d="M0 210c168-73 321 28 487-43 154-67 277 30 391 14 132-18 212-86 322-72v176H0z" fill="#d1e3e7" opacity=".055"/>
+  <circle cx="930" cy="151" r="92" fill="#8fc2d2" opacity=".08" filter="url(#blur)"/>
+  <path d="M0 323c178 3 311-15 493 5 202 22 443-23 707-11v403H0z" fill="url(#sea)"/>
+  <g fill="none" stroke="#6ca0b3" opacity=".13">
+    <path d="M0 384c214-24 346 30 552 3s424 18 648-6"/><path d="M0 430c187-20 376 25 582 1s397 13 618-10"/><path d="M0 490c225-16 380 19 587-7s424 14 613-4"/>
+  </g>
+  <path d="M698 281l86-20 38 18 43-35 90 6 38-22 207 5v487H650l11-126 42-75 12-83-38-59z" fill="url(#cliff)"/>
+  <path d="M792 264l31 18 43-34 88 8 40-24 206 5v55l-203 13-128-13-88 24-87-8z" fill="#39574e" opacity=".65"/>
+  <path d="M894 291l-23 116 35 89-21 148m113-346-16 118 33 81-15 167m110-269-30 111 27 127" fill="none" stroke="#496266" stroke-width="4" opacity=".25"/>
+  <path d="M0 413l93-21 70 13 54-17 100 30 69 64-16 238H0z" fill="#081a22"/>
+  <path d="M0 407l92-20 72 13 54-17 97 30 28 29-135-21-105 16-103-2z" fill="#294b43" opacity=".55"/>
+  <path d="M380 420l66-29 103 12 61 41-19 78-156 3-70-50z" fill="#0a202a"/>
+  <path d="M389 419l59-23 98 11 42 27-111-7z" fill="#31564d" opacity=".45"/>
+  <rect width="1200" height="720" fill="#03101d" opacity=".22"/>
+  <rect width="1200" height="720" fill="url(#fade)"/>
+</svg>
