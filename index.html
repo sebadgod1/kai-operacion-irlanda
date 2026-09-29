@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon.svg">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=4.0.2">
   <title>Kai — Operación Irlanda</title>
 </head>
 <body>
@@ -76,7 +76,7 @@
         <article class="settings-group"><h2>Datos y respaldo</h2><div class="backup-status"><span>Último respaldo</span><strong id="last-backup">Nunca</strong><small id="backup-warning"></small></div><button class="settings-action" id="export-json"><span>⇩</span><div><strong>Exportar JSON</strong><small>Respaldo completo</small></div><b>›</b></button><label class="settings-action" for="import-json"><span>⇧</span><div><strong>Importar JSON</strong><small>Compatible con versiones anteriores</small></div><b>›</b></label><input type="file" id="import-json" accept="application/json,.json" hidden><button class="settings-action" id="export-csv"><span>▦</span><div><strong>Exportar CSV</strong><small>Historial para planillas</small></div><b>›</b></button></article>
         <article class="settings-group danger-zone"><h2>Zona de reinicio</h2><button class="settings-action" id="reset-today"><span>↻</span><div><strong>Reiniciar el día</strong><small>Pide confirmación</small></div><b>›</b></button><button class="settings-action danger" id="reset-all"><span>!</span><div><strong>Borrar TODO</strong><small>Confirmación reforzada</small></div><b>›</b></button></article>
         <article class="install-card"><span>▣</span><div><strong>Instala Kai en tu iPhone</strong><p>En Safari: Compartir → Añadir a pantalla de inicio.</p></div></article>
-        <p class="app-version">KAI — OPERACIÓN IRLANDA · v4.0.1<br>Chile → Irlanda</p>
+        <p class="app-version">KAI — OPERACIÓN IRLANDA · v4.0.2<br>Chile → Irlanda</p>
       </section>
     </main>
 
@@ -89,6 +89,6 @@
   <div id="delete-modal" class="modal" aria-hidden="true"><div class="modal-card delete-card"><p class="modal-kicker danger-text">ACCIÓN IRREVERSIBLE</p><h2>Borrar todo el progreso</h2><p>Escribe <strong>BORRAR</strong> para confirmar.</p><input id="delete-confirmation" autocomplete="off" placeholder="BORRAR"><div class="modal-actions"><button id="cancel-delete">Cancelar</button><button id="confirm-delete" disabled>Borrar todo</button></div></div></div>
   <div id="achievement-modal" class="modal" aria-hidden="true"><div class="modal-card achievement-modal"><div id="achievement-icon">🏆</div><p class="modal-kicker">LOGRO DESBLOQUEADO</p><h2 id="achievement-title"></h2><p id="achievement-description"></p><button id="close-achievement" class="primary-button">Listo</button></div></div>
   <aside id="update-banner" class="update-banner" aria-live="polite"><span>Nueva versión disponible</span><button id="apply-update">ACTUALIZAR</button></aside>
-  <script src="./app.js" defer></script>
+  <script src="./app.js?v=4.0.2" defer></script>
 </body>
 </html>
