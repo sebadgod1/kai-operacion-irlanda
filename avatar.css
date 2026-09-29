@@ -1,0 +1,47 @@
+/* Kai avatar identity — v4.1.1 */
+.kai-head {
+  align-items: center;
+}
+
+.kai-avatar {
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid rgba(50, 201, 239, .42);
+  background-color: #071521;
+  background-image: url("./assets/kai-avatar.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  box-shadow:
+    0 0 0 3px rgba(50, 201, 239, .07),
+    0 10px 24px rgba(0, 0, 0, .25);
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.kai-head strong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kai-head strong::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #32c9ef;
+  box-shadow: 0 0 10px rgba(50, 201, 239, .8);
+}
+
+@media (max-width: 360px) {
+  .kai-avatar {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+}
