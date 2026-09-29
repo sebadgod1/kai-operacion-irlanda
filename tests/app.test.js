@@ -13,14 +13,14 @@ function boot(seed = {}) {
 function run(context, code) { return vm.runInContext(code, context); }
 function legacy(version, achievements = []) { return { version, days: { '2026-09-20': { habits: { bed: true, room: true, water: true, sleep: true }, minutes: { english: 61, reading: 42 }, trainings: ['bike', 'strength'], reflection: 'nota conservada' } }, achievements }; }
 for (const version of [1, 2, 3]) {
-  const achievements = version === 3 ? ['perfect', 'athlete', 'english5', 'streak7', 'xp1000'] : [];
+  const achievements = version === 3 ? ['first', 'perfect', 'athlete', 'english5', 'streak7', 'xp1000'] : [];
   const { store } = boot({ [`kai-irlanda-v${version}`]: JSON.stringify(legacy(version, achievements)) });
   const migrated = JSON.parse(store['kai-irlanda-v4']);
   assert.equal(migrated.days['2026-09-20'].minutes.english, 61);
   assert.equal(migrated.days['2026-09-20'].reflection, 'nota conservada');
   assert.deepEqual(migrated.days['2026-09-20'].trainings, ['bike', 'strength']);
   assert.ok(store[`kai-irlanda-v${version}`]);
-  if (version === 3) assert.deepEqual(migrated.achievements.sort(), ['athlete', 'english5', 'firstVictory', 'streak7', 'training10', 'xp1000'].filter(id => id !== 'athlete').sort());
+  if (version === 3) assert.deepEqual(migrated.achievements.sort(), ['first', 'english5', 'firstVictory', 'streak7', 'training10', 'xp1000'].sort());
 }
 {
   const { context } = boot();
@@ -58,9 +58,25 @@ for (const version of [1, 2, 3]) {
 }
 {
   const { context } = boot();
-  run(context, "absenceDays=0; let r=day(); globalThis.start=baseKaiContext(r); globalThis.first=kaiMessage(r); globalThis.second=kaiMessage(r); r.habits={bed:true,room:true,water:true}; globalThis.middle=baseKaiContext(r); r.habits.sleep=true;r.minutes={english:30,reading:0};globalThis.almost=baseKaiContext(r);r.minutes.reading=20;globalThis.complete=baseKaiContext(r);absenceDays=2;globalThis.returning=baseKaiContext(r)");
-  assert.equal(run(context, 'start'), 'start'); assert.equal(run(context, 'first'), run(context, 'second')); assert.equal(run(context, 'middle'), 'middle'); assert.equal(run(context, 'almost'), 'almost'); assert.equal(run(context, 'complete'), 'complete'); assert.equal(run(context, 'returning'), 'return');
-  run(context, "absenceDays=0; state.days[currentDate]=emptyDay(); setKaiEvent('englishExtra'); globalThis.englishEvent=kaiMessage(day()); day().kai={}; setKaiEvent('readingExtra'); globalThis.readingEvent=kaiMessage(day()); day().kai={}; setKaiEvent('trainingExtra'); globalThis.trainingEvent=kaiMessage(day())");
+  run(context, "(()=>{absenceDays=2; const r=day(); globalThis.returnAtZero=baseKaiContext(r); r.habits.bed=true; globalThis.earlyAfterReturn=baseKaiContext(r)})()");
+  assert.equal(run(context, 'returnAtZero'), 'return'); assert.equal(run(context, 'earlyAfterReturn'), 'early');
+  run(context, "(()=>{absenceDays=0; state.days[currentDate]=emptyDay(); const r=day(); globalThis.first=kaiMessage(r); globalThis.second=kaiMessage(r); Object.assign(r.habits,{bed:true,room:true,water:true}); globalThis.middle=baseKaiContext(r); r.habits.sleep=true;r.minutes={english:30,reading:0};globalThis.almost=baseKaiContext(r);r.minutes.reading=20;globalThis.complete=baseKaiContext(r)})()");
+  assert.equal(run(context, 'first'), run(context, 'second')); assert.equal(run(context, 'middle'), 'middle'); assert.equal(run(context, 'almost'), 'almost'); assert.equal(run(context, 'complete'), 'complete');
+  run(context, "(()=>{state.days[currentDate]=emptyDay(); setKaiEvent('englishExtra'); const r=day(); Object.assign(r.habits,{bed:true,room:true,water:true,sleep:true});r.minutes={english:60,reading:0};globalThis.extraAtFive=kaiMessage(r);r.minutes.reading=20;globalThis.extraAtSix=kaiMessage(r)})()");
+  assert.ok(run(context, "KAI_MESSAGES.almost.includes(extraAtFive)")); assert.ok(run(context, "KAI_MESSAGES.complete.includes(extraAtSix)"));
+  run(context, "state.days[currentDate]=emptyDay(); setKaiEvent('englishExtra'); globalThis.englishEvent=kaiMessage(day()); day().kai={}; setKaiEvent('readingExtra'); globalThis.readingEvent=kaiMessage(day()); day().kai={}; setKaiEvent('trainingExtra'); globalThis.trainingEvent=kaiMessage(day())");
   assert.ok(run(context, "KAI_MESSAGES.englishExtra.includes(englishEvent)")); assert.ok(run(context, "KAI_MESSAGES.readingExtra.includes(readingEvent)")); assert.ok(run(context, "KAI_MESSAGES.trainingExtra.includes(trainingEvent)"));
 }
-console.log('Kai v4.0.1 domain tests: ok');
+{
+  const { context } = boot();
+  for (const value of [1, 2, 3]) { run(context, `state.days[currentDate]=emptyDay(); streaks=()=>({current:${value},best:${value}}); maybeSetStreakEvent(${value - 1})`); assert.equal(run(context, 'day().kai.event'), undefined); }
+  run(context, "state.days[currentDate]=emptyDay(); streaks=()=>({current:4,best:4}); maybeSetStreakEvent(3)"); assert.equal(run(context, 'day().kai.event.context'), 'streak4'); assert.ok(run(context, "KAI_MESSAGES.streak4.includes(day().kai.event.message)"));
+  run(context, "state.days[currentDate]=emptyDay(); streaks=()=>({current:7,best:7}); maybeSetStreakEvent(6)"); assert.equal(run(context, 'day().kai.event.context'), 'streak7');
+  run(context, "state.days[currentDate]=emptyDay(); streaks=()=>({current:8,best:8}); maybeSetStreakEvent(7)"); assert.equal(run(context, 'day().kai.event.context'), 'streakRecord');
+}
+{
+  const { context } = boot();
+  assert.equal(run(context, 'visibleAchievements().some(a=>a.legacy)'), false);
+  run(context, "state.achievements=['first']; globalThis.visibleLegacy=visibleAchievements().filter(a=>a.legacy).map(a=>a.id)");
+  assert.deepEqual(Array.from(run(context, 'visibleLegacy')), ['first']);
+}console.log('Kai v4.0.1 domain tests: ok');

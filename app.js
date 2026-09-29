@@ -26,7 +26,9 @@ const KAI_MESSAGES = {
   englishExtra: ['Eso ya no fue cumplir por cumplir. Buen bloque.', 'Sesenta minutos de inglés. Trabajo serio, sin vender humo.', 'Meta superada. Ahora deja que ese bloque decante.'],
   readingExtra: ['Meta cumplida y todavía seguiste. Bien.', 'Buen bloque de lectura. Más profundidad, no solo minutos.', 'Seguiste después de la meta. Eso sí suma.'],
   trainingExtra: ['Meta lista y todavía metiste una más. Bien, pero no entrenemos por farmear XP.', 'Extra registrado. Ahora recuperación; el número no manda.', 'La meta semanal ya estaba. Este extra no es una obligación.'],
-  streak: ['Cuatro días es buena señal. Todavía no es una costumbre. Repite mañana.', 'La racha sirve si te ordena, no si te mete presión.', 'Varios días firmes. Mantén los pies en la tierra.']
+  streak4: ['Cuatro días es buena señal. Todavía no es una costumbre. Repite mañana.'],
+  streak7: ['Siete días seguidos. Buena base; ahora cuida que sea sostenible.'],
+  streakRecord: ['Nuevo récord. La constancia está creciendo; mantén el mismo criterio.']
 };
 const ACHIEVEMENTS = [
   { id: 'bookworm', icon: '📚', name: 'Bookworm', description: '40+ minutos de lectura en un día.', test: s => hasMinutes(s, 'reading', 40) },
@@ -43,6 +45,7 @@ const ACHIEVEMENTS = [
   { id: 'reading300', icon: '📖', name: 'Lectura 300', description: '300 minutos reales de lectura.', test: s => totalMinutes('reading', s) >= 300 },
   { id: 'training10', icon: '🏅', name: '10 entrenamientos', description: 'Diez sesiones registradas.', test: s => trainingCount(s) >= 10 },
   { id: 'training30', icon: '🏋️', name: '30 entrenamientos', description: 'Treinta sesiones registradas.', test: s => trainingCount(s) >= 30 },
+  { id: 'first', icon: '⚡', name: 'Primer paso', description: 'Logro histórico: completaste tu primera misión.', legacy: true, test: () => false },
   { id: 'english5', icon: '🇬🇧', name: 'No more excuses', description: 'Logro histórico: cinco sesiones de inglés.', legacy: true, test: () => false },
   { id: 'streak7', icon: '🔥', name: 'Una semana firme', description: 'Logro histórico: siete días ganados consecutivos.', legacy: true, test: () => false },
   { id: 'xp1000', icon: '💎', name: 'Imparable', description: 'Logro histórico: 1.000 XP alcanzados.', legacy: true, test: () => false }
@@ -148,9 +151,9 @@ function pickKaiMessage(group) {
 }
 function baseKaiContext(record) {
   const done = completedFor(record);
-  if (absenceDays >= 2) return 'return';
   if (done === 6) return 'complete';
   if (done === 5) return 'almost';
+  if (absenceDays >= 2 && done === 0) return 'return';
   if (done >= 3) return 'middle';
   if (done >= 1) return 'early';
   return 'start';
@@ -158,23 +161,24 @@ function baseKaiContext(record) {
 function setKaiEvent(context, delay = 0) {
   const record = day();
   record.kai ||= {};
-  const protectedDelay = ['almost', 'complete'].includes(baseKaiContext(record)) ? 2100 : 0;
-  const showDelay = Math.max(delay, protectedDelay);
-  record.kai.event = { context, message: pickKaiMessage(context), createdAt: Date.now(), showAfter: Date.now() + showDelay, expiresAt: Date.now() + showDelay + 120000 };
-  if (showDelay) setTimeout(() => { renderToday(); saveState(); }, showDelay + 20);
+  record.kai.event = { context, message: pickKaiMessage(context), createdAt: Date.now(), showAfter: Date.now() + delay, expiresAt: Date.now() + delay + 120000 };
+  if (delay) setTimeout(() => { renderToday(); saveState(); }, delay + 20);
 }
-function kaiMessage(record) {
-  record.kai ||= {};
-  const base = baseKaiContext(record);
-  const event = record.kai.event;
-  const eventVisible = event && Date.now() >= Number(event.showAfter || 0) && Date.now() < Number(event.expiresAt || 0);
-  const context = eventVisible ? event.context : base;
-  if (eventVisible) return event.message;
+function stableKaiMessage(record, context) {
   if (record.kai.context !== context || !record.kai.message) {
     record.kai.context = context;
     record.kai.message = pickKaiMessage(context);
   }
   return record.kai.message;
+}
+function kaiMessage(record) {
+  record.kai ||= {};
+  const base = baseKaiContext(record);
+  if (base === 'complete' || base === 'almost') return stableKaiMessage(record, base);
+  const event = record.kai.event;
+  const eventVisible = event && Date.now() >= Number(event.showAfter || 0) && Date.now() < Number(event.expiresAt || 0);
+  if (eventVisible) return event.message;
+  return stableKaiMessage(record, base);
 }
 function recommendedMission(record) {
   const pending = HABITS.filter(h => !habitDone(record, h.id));
@@ -239,7 +243,9 @@ function withTransaction(message, mutate, after) {
 }
 function maybeSetStreakEvent(previousBest) {
   const streak = streaks();
-  if ([4, 7].includes(streak.current) || streak.best > previousBest) setKaiEvent('streak', 2100);
+  if (streak.current === 4) setKaiEvent('streak4');
+  else if (streak.current === 7) setKaiEvent('streak7');
+  else if (streak.current >= 4 && streak.best > previousBest) setKaiEvent('streakRecord');
 }
 function toggleHabit(id) {
   const previous = Boolean(day().habits[id]); const wasPerfect = completedFor(day()) === 6; const previousBest = streaks().best;
@@ -254,13 +260,14 @@ function toggleTraining(id) {
   withTransaction(exists ? 'Entrenamiento eliminado' : 'Entrenamiento registrado ✓', () => { day().trainings = exists ? sessions.filter(session => session !== id) : [...sessions, id]; if (!exists && countBefore === training.goal) setKaiEvent('trainingExtra'); }, () => { if (!weekWasWon && wonWeeks().includes(weekKey())) celebrate('PERFECT WEEK 🏆', 'SEMANA GANADA · +50 XP'); });
 }
 
+function visibleAchievements(s = state) { return ACHIEVEMENTS.filter(achievement => !achievement.legacy || s.achievements.includes(achievement.id)); }
 function renderProgress() {
   const xp = calculateXP(); const level = levelData(xp); const daily = streaks(); const weekly = weeklyStreaks();
   const values = { 'metric-daily-streak': daily.current, 'metric-perfect': perfectDays(), 'progress-level': level.level, 'progress-xp': xp.toLocaleString('es-CL'), 'metric-7': `${consistency7()}%`, 'metric-english': `${totalMinutes('english').toLocaleString('es-CL')} min`, 'metric-reading': `${totalMinutes('reading').toLocaleString('es-CL')} min`, 'metric-english-avg': averageMinutes('english'), 'metric-reading-avg': averageMinutes('reading'), 'metric-weeks': wonWeeks().length, 'metric-weekly-streak': weekly.current, 'metric-best': daily.best, 'metric-weekly-best': weekly.best };
   Object.entries(values).forEach(([id, value]) => { document.querySelector(`#${id}`).textContent = value; });
   document.querySelector('#level-bar').style.width = `${level.progress}%`; document.querySelector('#next-level').textContent = `${level.ceiling - xp} XP para el siguiente nivel`;
   document.querySelector('#skills-list').innerHTML = SKILLS.map(skill => { const value = skill.value(state); const nextIndex = skill.milestones.findIndex(m => value < m); const levelNumber = nextIndex === -1 ? skill.milestones.length : nextIndex; const previous = levelNumber === 0 ? 0 : skill.milestones[levelNumber - 1]; const next = nextIndex === -1 ? skill.milestones.at(-1) : skill.milestones[nextIndex]; const progress = nextIndex === -1 ? 100 : Math.max(0, (value - previous) / (next - previous) * 100); return `<article class="skill"><div class="skill-head"><strong>${skill.name}</strong><span>Nivel ${levelNumber}${nextIndex === -1 ? ' · máximo' : ''}</span></div><div class="skill-data">${value.toLocaleString('es-CL')} ${skill.unit}${nextIndex === -1 ? '' : ` · próximo hito: ${next}`}</div><div class="progress-track"><span style="width:${progress}%"></span></div></article>`; }).join('');
-  document.querySelector('#achievements-list').innerHTML = ACHIEVEMENTS.map(achievement => { const unlocked = state.achievements.includes(achievement.id) || achievement.test(state); return `<article class="achievement ${unlocked ? 'unlocked' : ''}"><span>${unlocked ? achievement.icon : '◌'}</span><strong>${achievement.name}</strong><small>${achievement.description}</small></article>`; }).join('');
+  document.querySelector('#achievements-list').innerHTML = visibleAchievements().map(achievement => { const unlocked = state.achievements.includes(achievement.id) || achievement.test(state); return `<article class="achievement ${unlocked ? 'unlocked' : ''}"><span>${unlocked ? achievement.icon : '◌'}</span><strong>${achievement.name}</strong><small>${achievement.description}</small></article>`; }).join('');
 }
 function checkAchievements() { const unlocked = ACHIEVEMENTS.filter(a => !a.legacy && !state.achievements.includes(a.id) && a.test(state)); if (!unlocked.length) return []; state.achievements.push(...unlocked.map(a => a.id)); saveState(); showAchievement(unlocked[0]); return unlocked; }
 function showAchievement(achievement) { document.querySelector('#achievement-icon').textContent = achievement.icon; document.querySelector('#achievement-title').textContent = achievement.name; document.querySelector('#achievement-description').textContent = achievement.description; openModal('#achievement-modal'); }
