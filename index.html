@@ -41,9 +41,11 @@
 
         <div class="section-heading"><div><p class="eyebrow">MISIONES DIARIAS</p><h2>Gana el día</h2></div><span id="mission-xp">+0 XP</span></div>
         <div id="habit-list" class="habit-list"></div>
+        <div id="perfect-day" class="perfect-banner">PERFECT DAY ✨ <small>+20 XP · Día ganado</small></div>
 
         <div class="section-heading training-heading"><div><p class="eyebrow">ENTRENAMIENTO SEMANAL</p><h2>Mueve el cuerpo</h2></div><span id="week-label"></span></div>
         <div id="training-list" class="training-list"></div>
+        <div id="perfect-week" class="perfect-banner week">PERFECT WEEK 🏆 <small>+50 XP · Semana ganada</small></div>
 
         <article class="reflection-card">
           <div><span class="reflection-icon">✦</span><div><p class="eyebrow">BITÁCORA</p><h2>¿Cómo estuvo tu día?</h2></div></div>
@@ -60,8 +62,14 @@
           <article><span>30 DÍAS</span><strong id="metric-30">0%</strong><small>cumplimiento</small></article>
           <article><span>🇬🇧 INGLÉS</span><strong id="metric-english">0m</strong><small>acumulados</small></article>
           <article><span>📖 LECTURA</span><strong id="metric-reading">0m</strong><small>acumulados</small></article>
-          <article><span>✨ PERFECTOS</span><strong id="metric-perfect">0</strong><small>días 6/6</small></article>
-          <article><span>🏆 MEJOR RACHA</span><strong id="metric-best">0</strong><small>días</small></article>
+          <article><span>🇬🇧 PROMEDIO 7 DÍAS</span><strong id="metric-english-avg">0m</strong><small>inglés por día</small></article>
+          <article><span>📖 PROMEDIO 7 DÍAS</span><strong id="metric-reading-avg">0m</strong><small>lectura por día</small></article>
+          <article><span>✨ DÍAS GANADOS</span><strong id="metric-perfect">0</strong><small>días 6/6</small></article>
+          <article><span>🏆 SEMANAS GANADAS</span><strong id="metric-weeks">0</strong><small>metas completas</small></article>
+          <article><span>🔥 RACHA DIARIA</span><strong id="metric-daily-streak">0</strong><small>días actuales</small></article>
+          <article><span>🛡️ RÉCORD DIARIO</span><strong id="metric-best">0</strong><small>mejor racha</small></article>
+          <article><span>⚓ RACHA SEMANAL</span><strong id="metric-weekly-streak">0</strong><small>semanas actuales</small></article>
+          <article><span>🥇 RÉCORD SEMANAL</span><strong id="metric-weekly-best">0</strong><small>mejor racha</small></article>
         </div>
         <div class="section-heading"><div><p class="eyebrow">SKILLS</p><h2>Tu build actual</h2></div></div>
         <div id="skills-list" class="skills-list"></div>
@@ -84,6 +92,12 @@
 
       <section class="view" id="view-settings" data-title="Ajustes">
         <div class="page-intro"><p class="eyebrow">CONTROL</p><h2>Tus datos son tuyos.</h2><p>Todo se guarda solamente en este dispositivo.</p></div>
+        <article class="settings-group"><h3>Apariencia</h3>
+          <div class="theme-picker" role="group" aria-label="Tema visual">
+            <button data-theme="classic"><span>◆</span><strong>Clásico</strong><small>Identidad original</small></button>
+            <button data-theme="voyage"><span>⚓</span><strong>Grand Voyage</strong><small>Elegancia náutica</small></button>
+          </div>
+        </article>
         <article class="settings-group"><h3>Datos y respaldo</h3>
           <button class="settings-action" id="export-json"><span>⬇️</span><div><strong>Exportar backup JSON</strong><small>Guarda todo tu progreso</small></div><b>›</b></button>
           <label class="settings-action" for="import-json"><span>⬆️</span><div><strong>Importar backup JSON</strong><small>También acepta kai-irlanda-v1</small></div><b>›</b></label><input type="file" id="import-json" accept="application/json,.json" hidden>
@@ -94,7 +108,7 @@
           <button class="settings-action danger" id="reset-all"><span>⚠️</span><div><strong>Reiniciar todos los datos</strong><small>Esta acción no se puede deshacer</small></div><b>›</b></button>
         </article>
         <article class="install-card"><span>📲</span><div><h3>Instálala en tu iPhone</h3><p>En Safari toca Compartir y luego “Añadir a pantalla de inicio”.</p></div></article>
-        <p class="app-version">KAI — OPERACIÓN IRLANDA · v1.0.0<br>Hecha para llegar preparado 🇨🇱 → 🇮🇪</p>
+        <p class="app-version">KAI — OPERACIÓN IRLANDA · v3.0.0<br>Hecha para llegar preparado 🇨🇱 → 🇮🇪</p>
       </section>
     </main>
 
@@ -106,6 +120,7 @@
     </nav>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="celebration" class="celebration" aria-live="polite"><i>✦</i><strong>PERFECT DAY ✨</strong><span>✦ · ✧ · ✦</span></div>
   <div id="achievement-modal" class="modal" aria-hidden="true"><div class="modal-card"><div class="achievement-burst">🏆</div><p class="eyebrow">LOGRO DESBLOQUEADO</p><h2 id="achievement-title"></h2><p id="achievement-description"></p><button id="close-achievement" class="primary-button">Vamos con todo</button></div></div>
   <script src="./app.js" defer></script>
 </body>
